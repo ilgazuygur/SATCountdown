@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SAT Countdown</title>
+<style>
+  :root {
+    --bg: #0a0a12;
+    --card: rgba(255, 255, 255, 0.045);
+    --card-hover: rgba(255, 255, 255, 0.07);
+    --border: rgba(255, 255, 255, 0.09);
+    --text: #f4f4f8;
+    --muted: #8c8ca0;
+    --accent: #8b7bff;
+    --accent-2: #56ccf2;
+    --good: #4ad991;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(700px circle at 15% 5%, rgba(139, 123, 255, 0.20), transparent 45%),
+      radial-gradient(700px circle at 85% 95%, rgba(86, 204, 242, 0.14), transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 960px;
+    text-align: center;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 7px 16px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--card);
+    margin-bottom: 18px;
+  }
+
+  h1 {
+    font-size: clamp(22px, 5vw, 32px);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 40px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+
+  .card {
+    position: relative;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 28px 20px 24px;
+    transition: background 0.25s ease, transform 0.25s ease, border-color 0.25s ease;
+  }
+
+  .card:hover { background: var(--card-hover); transform: translateY(-3px); }
+
+  .card.next { border-color: rgba(139, 123, 255, 0.5); }
+  .card.next::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: 22px;
+    box-shadow: 0 0 40px rgba(139, 123, 255, 0.22);
+    pointer-events: none;
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .card.next .tag   { color: var(--accent); background: rgba(139, 123, 255, 0.16); }
+  .card.past .tag   { color: var(--good);   background: rgba(74, 217, 145, 0.14); }
+  .card.future .tag { color: var(--muted);  background: rgba(255, 255, 255, 0.05); }
+
+  .date {
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    background: linear-gradient(120deg, #ffffff 30%, var(--accent-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .day {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 500;
+    margin-top: 4px;
+    margin-bottom: 22px;
+  }
+
+  .timer {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    padding: 12px 2px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .num {
+    font-size: clamp(20px, 4.5vw, 28px);
+    font-weight: 800;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .lbl {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .completed {
+    padding: 26px 8px;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--good);
+  }
+
+  .footer {
+    margin-top: 34px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; max-width: 380px; margin: 0 auto; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <span class="badge">SAT Countdown</span>
+    <h1>Time Remaining Until Each SAT</h1>
+    <p class="subtitle">Three upcoming exams — each with its own live countdown</p>
+
+    <div class="grid" id="grid"></div>
+
+    <div class="footer">All exams start at 08:00 Turkey time (UTC+3)</div>
+  </div>
+
+  <script>
+    // Every exam starts at 08:00 Turkey time = 05:00 UTC
+    const EXAMS = [
+      { date: "Aug 22, 2026", day: "Saturday", iso: "2026-08-22T05:00:00Z" },
+      { date: "Sep 12, 2026", day: "Saturday", iso: "2026-09-12T05:00:00Z" },
+      { date: "Oct 3, 2026",  day: "Saturday", iso: "2026-10-03T05:00:00Z" },
+    ];
+
+    const pad = (n) => String(n).padStart(2, "0");
+    const grid = document.getElementById("grid");
+    const cards = [];
+
+    // Build the cards once
+    EXAMS.forEach((e) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <span class="tag"></span>
+        <div class="date">${e.date}</div>
+        <div class="day">${e.day} · 08:00 TR</div>
+        <div class="body"></div>`;
+      grid.appendChild(card);
+      cards.push({ el: card, tag: card.querySelector(".tag"), body: card.querySelector(".body") });
+    });
+
+    function timerHTML(total) {
+      const d = Math.floor(total / 86400);
+      const h = Math.floor((total % 86400) / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      return `<div class="timer">
+        <div class="unit"><span class="num">${d}</span><span class="lbl">Days</span></div>
+        <div class="unit"><span class="num">${pad(h)}</span><span class="lbl">Hrs</span></div>
+        <div class="unit"><span class="num">${pad(m)}</span><span class="lbl">Min</span></div>
+        <div class="unit"><span class="num">${pad(s)}</span><span class="lbl">Sec</span></div>
+      </div>`;
+    }
+
+    function render() {
+      const now = Date.now();
+      const nextIndex = EXAMS.findIndex((e) => new Date(e.iso).getTime() > now);
+
+      EXAMS.forEach((e, i) => {
+        const c = cards[i];
+        const ms = new Date(e.iso).getTime() - now;
+
+        if (ms <= 0) {
+          c.el.className = "card past";
+          c.tag.textContent = "Completed";
+          c.body.innerHTML = `<div class="completed">Completed 🎓</div>`;
+        } else {
+          const isNext = i === nextIndex;
+          c.el.className = "card " + (isNext ? "next" : "future");
+          c.tag.textContent = isNext ? "Up Next" : "Upcoming";
+          c.body.innerHTML = timerHTML(Math.floor(ms / 1000));
+        }
+      });
+    }
+
+    render();
+    setInterval(render, 1000);
+  </script>
+</body>
+</html>
