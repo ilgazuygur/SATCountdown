@@ -179,6 +179,22 @@
     color: var(--good);
   }
 
+  .results {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .results strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent-2);
+  }
+
   .footer {
     margin-top: 34px;
     font-size: 13px;
@@ -194,7 +210,7 @@
   <div class="container">
     <span class="badge">SAT Countdown</span>
     <h1>Time Remaining Until Each SAT</h1>
-    <p class="subtitle">Three upcoming exams — each with its own live countdown</p>
+    <p class="subtitle">Three upcoming exams, each with its own live countdown and score release date</p>
 
     <div class="grid" id="grid"></div>
 
@@ -204,9 +220,9 @@
   <script>
     // Every exam starts at 08:00 Turkey time = 05:00 UTC
     const EXAMS = [
-      { date: "Aug 22, 2026", day: "Saturday", iso: "2026-08-22T05:00:00Z" },
-      { date: "Sep 12, 2026", day: "Saturday", iso: "2026-09-12T05:00:00Z" },
-      { date: "Oct 3, 2026",  day: "Saturday", iso: "2026-10-03T05:00:00Z" },
+      { date: "Oct 3, 2026", day: "Saturday", iso: "2026-10-03T05:00:00Z", results: "Oct 16, 2026" },
+      { date: "Nov 7, 2026", day: "Saturday", iso: "2026-11-07T05:00:00Z", results: "Nov 20, 2026" },
+      { date: "Dec 5, 2026", day: "Saturday", iso: "2026-12-05T05:00:00Z", results: "Dec 18, 2026" },
     ];
 
     const pad = (n) => String(n).padStart(2, "0");
@@ -221,7 +237,8 @@
         <span class="tag"></span>
         <div class="date">${e.date}</div>
         <div class="day">${e.day} · 08:00 TR</div>
-        <div class="body"></div>`;
+        <div class="body"></div>
+        <div class="results">Scores released<strong>${e.results}</strong></div>`;
       grid.appendChild(card);
       cards.push({ el: card, tag: card.querySelector(".tag"), body: card.querySelector(".body") });
     });
